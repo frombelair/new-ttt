@@ -1,129 +1,267 @@
-#This code allows a two player tic-tac-toe game to be played from the command line
+class Game
 
-#These establish the beginning arrays/hashes and their values.  
+    attr_reader :grid, :player_1, :player_2
 
-#Empty fields elements will be removed when the chosen fields are input by players
-empty_fields = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    
 
-board_fields = {1 => " ", 2 => " ", 3 => " ", 4 => " ", 5 => " ", 6 => " ", 7 => " ", 8 => " ", 9 => " "}
+    @@wins = [[0, 1 ,2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]] # winning combos
 
-@game = true
+    
 
-# This function provides the basic game instruction
+    def initialize
 
-def game_instruction
-    puts ""
-    puts "Let's play Tic-Tac-Toe!"
-    print "\n" * 2
-    puts " 1 | 2 | 3    The positions to play on the tic-tac-toe board are"
-    puts "---|---|---   represented by number 1-9 as shown."
-    puts " 4 | 5 | 6    To place an 'X' or 'O' in a certain position,"
-    puts "---|---|---   simply enter the number of that position."
-    puts " 7 | 8 | 9 "
-    puts ""
-end
+        @grid = Board.new
 
-# This section defines the players and their markers
-def players
-    puts "Player 1, would you like to be X or O? "
-    $player1 = gets.chomp
+        @player_1 = Player.new
 
-        if $player1 == "X"
-            $player2 = "O"
+        @player_2 = Player.new
+
+        @winner = nil
+
+        @current_turn = 1
+
+    end
+
+    
+
+    def play # just a function to call other functions in an order
+
+        show_welcome_message
+
+        get_players_names
+
+        start_playing
+
+        show_result
+
+        show_game_over_message
+
+    end
+
+
+
+    def show_welcome_message
+
+        puts "\n"
+
+        puts "\n"
+
+        puts "------------------------------------"
+
+        puts "Welcome to the best TicTacToe Game!!"
+
+        puts "------------------------------------"
+
+        puts "\n"
+
+        puts "\n"
+
+    end
+
+    
+
+    def get_players_names
+
+        print "Player 1, Please enter your name: " # prompts for user input on screen
+
+        @player_1.name = gets.chomp # collects user input and cuts off the last element in the string
+
+        puts "You will be player X"
+
+        puts "\n"
+
+        sleep(1) # adds 1 sec before printing player 2 question
+
+        @player_1.symbol = 'X' # assigns player_1 to x
+
+        print "Player 2, Please enter your name: "
+
+        @player_2.name = gets.chomp
+
+        puts "You will be player O"
+
+        @player_2.symbol = 'O'
+
+        puts "\n"
+
+    end
+
+    
+
+    def start_playing
+
+        sleep(1)
+
+        puts "#{@player_1.name}, we will start with you."
+
+        @grid.print_grid # initializes a new game Board and call on the print_grid function in that Board class
+
+        take_turns until game_over # calls take_turns function until the game is over and then calls game_over function
+
+    end
+
+    
+
+    def take_turns
+
+        @current_turn.odd? ? turn(@player_1) : turn(@player_2) # initializes current_turn which starts out set to 1. checks to see if it is odd then calls the turn function and passes player 1 if it is or player 2 if it is not.
+
+    end
+
+    
+
+    def turn(player)
+
+        show_turn(player) # calls function bringing back the current player and their symbol
+
+        input = get_valid_cell # sets input to the get_valid_cell function
+
+        if @grid.update(input, player.symbol) # if grid.update (calls update function) with a valid cell and the current players symbol then it will set current_turn equal to current_turn plus 1 or if it is not a valid location (spot is taken) returns an error
+
+            @current_turn += 1 # sets current_turn equal to current_turn plus 1
+
         else
-            $player2 = "X"
+
+            error = "SORRY, THAT CELL IS TAKEN"
+
         end
 
-    puts "Great! Player 1 is #{$player1} and Player 2 is #{$player2}"
-    puts ""
-    
-end
+        @grid.print_grid # calls the current game board again
 
-#This function draws the sample board with numbers and the game board ready for play
-def draw_board(bf)
-    puts ""
-    puts "Let's get started!'"
-    puts ""
-    puts "Sample board with numbers:"
-    puts ""
-    puts " 1 | 2 | 3 "
-    puts "---+---+---"
-    puts " 4 | 5 | 6 "
-    puts "---+---+---"
-    puts " 7 | 8 | 9 "
-    puts ""
-    puts "Game Board:"
-    puts ""
-    puts " #{bf[1]} | #{bf[2]} | #{bf[3]} "
-    puts "---+---+---"
-    puts " #{bf[4]} | #{bf[5]} | #{bf[6]} "
-    puts "---+---+---"
-    puts " #{bf[7]} | #{bf[8]} | #{bf[9]} "
-    puts ""
-end
+        puts error # puts the error under the current game board
 
-#This function clears out the empty fields as they are chosen.
-def fill_fields(bf, ef)
-    bf.each do |key, value|
-        if value != " "
-            ef.delete(key)
-        end
+        check_for_win(player) # calls check_for_win function and passes the current player
+
     end
-end
 
-#This function ends the game if all the empty fields have been chosen
-def full_board?(ef)
-    if ef == []
-        puts "It's a tie!"
-        @game = false
-    end
-end
-
-# This determines the winner of the game
-def winner?(bf)
-    winning = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
-    winning.each do |element|
-        if bf[element[0]] == "X" && bf[element[1]] == "X" && bf[element[2]] == "X"
-            puts "Congratulations! Player X has won!"
-            @game = false
-            exit #this ends the game so there won't be two winners'
-        elsif bf[element[0]] == "O" && bf[element[1]] == "O" && bf[element[2]] == "O"
-            puts "Congratulations! Player O has won!"
-            @game = false
-        end
-    end
-end
-
-#This starts the game by displaying the sample board and the actual game board
-game_instruction
-players
-draw_board(board_fields)
-
-# This function allows the players to take turns
-while @game
-
-    #player1 turn
-    puts "Player 1, choose an empty field (1-9):"
-
-    chosen_field1 = gets.chomp.to_i
     
 
-    board_fields[chosen_field1] = "#{$player1}"
-    fill_fields(board_fields, empty_fields)
-    draw_board(board_fields)
-    winner?(board_fields)
-    full_board?(empty_fields)
+    def show_turn(player)
 
-    #player2 turn
-    puts "Player 2, choose an empty field (1-9):"
+        print "#{player.name} ('#{player.symbol}') " # shows the current player and what their symbol is
 
-    chosen_field2 = gets.chomp.to_i
+    end
 
-    board_fields[chosen_field2] = "#{$player2}"
-    fill_fields(board_fields, empty_fields)
-    draw_board(board_fields)
-    winner?(board_fields)
-    full_board?(empty_fields)
+    
+
+    def get_valid_cell # this function is called by the turn function it lets trun know if the position is abaliable
+
+        input = nil
+
+        until (0..8).include?(input) ##########################################################################
+
+            print 'enter your move (1-9) top to bottom, left to right: '
+
+            input = gets.chomp.to_i - 1 # array is indexed 0-8; positionitions are 1-9
+
+        end
+
+        input
+
+    end
+
+    
+
+    def check_for_win(player) # searches winning combos and assigns winner to current player
+
+        @@wins.each do |w| 
+
+            @winner = player if w.all? { |a| @grid.board[a] == player.symbol } ###########################################################################################################
+
+        end
+
+    end
+
+    
+
+    def game_over
+
+        @current_turn > 9 || @winner
+
+    end
+
+    
+
+    def show_game_over_message # think about taking this out
+
+        puts '---------'
+
+        puts 'Game Over'
+
+        puts '---------'
+
+    end
+
+    
+
+    def show_result
+
+        if @current_turn > 9 && !@winner
+
+            puts "IT'S A TIE!"
+
+        else
+
+            puts "CONGRATS, #{@winner.name}.  YOU WON!"
+
+        end
+
+    end
+
+    
+
+    class Board
+
+        attr_reader :board, :empty_cell # sets a variable as an attribute that can be read when called
+
+        
+
+        def initialize
+
+            @empty_cell = '-' # sets empty_cell as placeholder for empty cells
+
+            @board = Array.new(9, @empty_cell) # creats a 9 element array of "-"
+
+        end
+
+
+
+        def print_grid # prints 3 X 3 grid with "-" as placeholders
+
+            puts "\n"
+
+            @board.each_slice(3) {|row| puts row.join(' | ')} # breaks the elements into blocks of 3 and puts each block on a new line adds a string of " | " between each element on each new line
+
+            puts "\n"
+
+        end
+
+
+
+        def update(position, symbol)
+
+            if @board[position] == @empty_cell # looks to see if there is an empty cell on the board in the position just input by the user
+
+                @board[position] = symbol # if position is empty, set the position equal to the symbol of the current user
+
+                return true
+
+            else
+
+                return false
+
+            end
+
+        end
+
+    end
+
+
+
+    Player = Struct.new(:name, :symbol) # i have no idea what this does. i do know if i take it out the game will not work
 
 end
 
+
+
+Game.new.play # hits the Game class and calls the play function

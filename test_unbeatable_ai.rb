@@ -1,65 +1,157 @@
 require "minitest/autorun"
-require_relative 'unbeatable_ai.rb'
+
+require_relative "unbeatable_ai.rb"
 
 
-class TestUnbeatableAI < Minitest::Test
+
+class TestUnbeatableAi < Minitest::Test
+
+
 
     def test_create_player
-        player = UnbeatableAI.new("X")
-        assert_equal("X", player.marker)
+
+        player = UnbeatableAi.new("x")
+
+        assert_equal("x", player.marker)
+
     end
 
-    def test_for_valid_space?
-        player = UnbeatableAI.new("X")
-        assert_equal(true, player.valid_space?(player.marker, ""))
+
+
+    def test_for_o_potential_block_position_0
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(0, player.get_move([" ", "x", "x", " ", " ", " ", " ", " ", " "]))
+
     end
 
-    def test_for_O_potential_win_position_0
-        player = UnbeatableAI.new("O")
-        assert_equal(0, player.get_move(["", "X", "X", "", "", "", "", "", ""]))
+
+
+     def test_for_o_potential_win_position_6
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(6, player.get_move(["x", "x", "o", " ", "o", " ", " ", " ", "x"]))
+
     end
 
-     def test_for_O_potential_win_position_6
-        player = UnbeatableAI.new("O")
-        assert_equal(6, player.get_move(["X", "X", "O", "", "O", "", "", "", "X"]))
+
+
+    def test_for_o_potential_win_position_3
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(3, player.get_move(["x", " ", " ", " ", "o", "o", " ", " ", "x"]))
+
     end
 
-    def test_for_O_potential_win_position_3
-        player = UnbeatableAI.new("O")
-        assert_equal(3, player.get_move(["X", "", "", "", "O", "O", "", "", "X"]))
+
+
+    def test_for_x_potential_win_position_4
+
+        player = UnbeatableAi.new("x")
+
+        assert_equal(4, player.get_move(["x", "o", "x", " ", " ", " ", "o", " ", "x"]))
+
     end
 
-    def test_for_X_potential_win_position_4
-        player = UnbeatableAI.new("X")
-        assert_equal(4, player.get_move(["X", "O", "X", "", "", "", "O", "", "X"]))
+
+
+    def test_for_o_block_position_8
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(8, player.get_move(["x", " ", "o", " ", "x", " ", "o", " ", " "]))
+
     end
 
-    def test_for_O_block_position_8
-        player = UnbeatableAI.new("O")
-        assert_equal(8, player.get_move(["X", "", "O", "", "X", "", "O", "", ""]))
+
+
+    def test_for_x_block_position_5
+
+        player = UnbeatableAi.new("x")
+
+        assert_equal(5, player.get_move(["x", " ", " ", "o", "o", " ", " ", "x", " "]))
+
     end
 
-    def test_for_X_block_position_5
-        player = UnbeatableAI.new("X")
-        assert_equal(5, player.get_move(["X", "", "", "O", "O", "", "", "X", ""]))
+
+
+    def test_for_x_position_4
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(4, player.get_move(["x", "o", "x", "o", " ", " ", "x", " ", " "]))
+
     end
 
-    # def test_valid_move
-    #     player = UnbeatableAI.new("X")
-    #     move = player.get_move(Array.new(9, ""))
-    #     assert_equal(true, [0, 1, 2, 3, 4, 5, 6, 7, 8].include?(move))
-    # end
 
-    # def test_go_for_win_0
-    #     player = UnbeatableAI.new("X")
-    #     move = 0
-    #     assert_equal(0, player.get_move(["","X","X","","","","","",""]))
-    # end
 
-    # def test_go_for_win_4
-    #     player = UnbeatableAI.new("X")
-    #     move = 4
-    #     assert_equal(4, player.get_move(["","","","X","","X","","",""]))
-    # end
+    def test_center_available?
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(4, player.get_move(["x", "o", "x", "o", " ", " ", " ", " ", " "]))
+
+    end
+
+
+
+    def test_go_for_win_0
+
+        player = UnbeatableAi.new("x")
+
+        move = 0
+
+        assert_equal(0, player.get_move([" ","x","x"," "," "," "," "," "," "]))
+
+    end
+
+
+
+    def test_go_for_win_4
+
+        player = UnbeatableAi.new("x")
+
+        move = 4
+
+        assert_equal(4, player.get_move(["x"," "," "," "," "," "," "," ","x"]))
+
+    end
+
+
+
+    def test_for_o_takes_edge_if_x_opposite_corners
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(1, player.get_move(["x", " ", " ", " ", "o", " ", " ", " ", "x"]))
+
+    end
+
+
+
+    def test_for_o_takes_edge_if_x_takes_other_corners
+
+        player = UnbeatableAi.new("o")
+
+        assert_equal(1, player.get_move([" ", " ", "x", " ", "o", " ", "x", " ", " "]))
+
+    end
+
+
+
+    def test_for_x_will_block_win
+
+        player = UnbeatableAi.new("x")
+
+        assert_equal(7, player.get_move(["x", "o", " ", " ", "o", " ", " ", " ", "x"]))
+
+    end 
+
+
+
+
 
 end

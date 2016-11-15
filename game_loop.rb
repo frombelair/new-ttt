@@ -1,13 +1,25 @@
-require_relative 'console_game.rb'
+require_relative "console_game.rb"
 
-game = Console_game.new()
+
+
+game = Game.new
+
+
 
 until game.game_over?
+
     game.change_player
-    game.draw_board
+
+    game.print_board
+
     move = game.get_move
+
     game.make_move(move)
-    game.draw_board
+
+    game.print_board
+
 end
+
+
 
 game.end_message
